@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Résultats</title>
+</head>
+<body>
+    <h1>Restaurants trouvés</h1>
+    <ul>
+        {% for resto in restos %}
+        <li>{{ resto['name'] }} - {{ resto['vicinity'] }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/">Revenir</a>
+</body>
+</html>
