@@ -24,7 +24,7 @@ def index():
     
     return render_template('index.html')
 
-GOOGLE_API_KEY = 'AIzaSyCRgWwxYG9iw8wEVzPZLv_0D2heYfLxqws'  # Remplace par ta clé API
+GOOGLE_API_KEY = 'API'  # Remplace par ta clé API
 
 def get_route(depart, arrivee):
     url = f"https://maps.googleapis.com/maps/api/directions/json?origin={depart}&destination={arrivee}&key={GOOGLE_API_KEY}"
