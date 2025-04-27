@@ -2,18 +2,52 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Où Manger Sur La Route</title>
+    <title>On Mange Où ?</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_index.css') }}">
 </head>
 <body>
-    <h1>Planifie ton trajet</h1>
-    <form method="post">
-        <label>Départ :</label>
-        <input type="text" name="depart" required><br><br>
-        
-        <label>Arrivée :</label>
-        <input type="text" name="arrivee" required><br><br>
-        
-        <button type="submit">Chercher</button>
+    <h1>On Mange Où ?</h1>
+    <h2>Planifiez votre trajet !</h2>
+    <!-- Mettre à jour l'action du formulaire et ajouter un ID -->
+    <form method="post" action="{{ url_for('search') }}" id="search-form">
+        <label for="depart">Adresse de départ :</label>
+        <input type="text" id="depart" name="depart" placeholder="Ex: Paris, France" required><br><br>
+
+        <label for="arrivee">Adresse d'arrivée :</label>
+        <input type="text" id="arrivee" name="arrivee" placeholder="Ex: Lyon, France" required><br><br>
+
+        <button type="submit">Trouver des restaurants sur la route</button>
     </form>
+
+    <!-- Ajouter un indicateur de chargement (initiallement caché) -->
+    <div id="loading" style="display: none;">
+        <!-- Mettre à jour le paragraphe pour inclure les détails -->
+        <p id="loading-message">Recherche en cours, veuillez patienter...</p>
+    </div>
+
+    <script>
+        const form = document.getElementById('search-form');
+        const loadingIndicator = document.getElementById('loading');
+        const loadingMessage = document.getElementById('loading-message'); // Récupérer le paragraphe
+        const departInput = document.getElementById('depart');
+        const arriveeInput = document.getElementById('arrivee');
+
+        form.addEventListener('submit', function() {
+            // Récupérer les valeurs avant de masquer le formulaire
+            const departValue = departInput.value;
+            const arriveeValue = arriveeInput.value;
+
+            // Mettre à jour le message de chargement
+            loadingMessage.textContent = `Recherche de restaurants entre ${departValue} et ${arriveeValue}, veuillez patienter...`;
+
+            // Masquer le formulaire et afficher l'indicateur de chargement
+            form.style.display = 'none';
+            loadingIndicator.style.display = 'block';
+        });
+    </script>
 </body>
 </html>
