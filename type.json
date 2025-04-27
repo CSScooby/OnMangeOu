@@ -1,0 +1,22 @@
+{
+    "nourriture": [
+        "restaurant",
+        "meal_takeaway",
+        "cafe",
+        "bakery",
+        "bar",
+        "grocery_or_supermarket",
+        "meal_delivery",
+        "food"
+    ],
+    "transport_voiture": [
+        "gas_station",
+        "charging_station",
+        "car_wash",
+        "parking",
+        "car_repair",
+        "car_rental",
+        "car_dealer"
+        
+    ]
+}
