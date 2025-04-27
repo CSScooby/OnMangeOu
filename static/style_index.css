@@ -1,0 +1,119 @@
+/* Réinitialisation et styles de base */
+:root {
+    --primary-blue: #3B82F6; /* Nouvelle couleur bleue */
+    --primary-blue-darker: #2563EB;
+    --primary-blue-lighter: #EFF6FF;
+    --border-radius-medium: 8px;
+    --border-radius-large: 12px;
+    --shadow-small: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    background-color: #f8f9fa; /* Fond légèrement différent */
+    color: #202124; /* Texte principal Google */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #ffffff;
+    padding: 32px;
+    border-radius: var(--border-radius-large); /* Coins plus arrondis */
+    box-shadow: var(--shadow-large); /* Ombre plus prononcée */
+    max-width: 500px;
+    width: 100%;
+}
+
+h1 {
+    color: #202124;
+    font-size: 32px;
+    font-weight: 500;
+    margin-top: 0;
+    margin-bottom: 32px; /* Plus d'espace */
+    text-align: center;
+}
+
+/* Style des formulaires Material */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Espace entre les éléments */
+}
+
+label {
+    font-size: 14px;
+    color: #5f6368; /* Couleur secondaire Google */
+    margin-bottom: 4px; /* Petit espace avant l'input */
+}
+
+input[type="text"] {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    padding: 12px 16px;
+    border: 1px solid #dadce0; /* Bordure Google */
+    border-radius: var(--border-radius-medium); /* Coins arrondis */
+    background-color: #fff;
+    color: #202124;
+    box-shadow: var(--shadow-small);
+    transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3), var(--shadow-small); /* Halo + ombre */
+}
+
+button[type="submit"] {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 24px;
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-medium); /* Coins arrondis */
+    cursor: pointer;
+    text-transform: none; /* Pas de majuscules forcées */
+    height: 40px; /* Légèrement plus haut */
+    box-shadow: var(--shadow-medium);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    align-self: flex-end; /* Aligner à droite */
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-blue-darker);
+    box-shadow: var(--shadow-large); /* Ombre plus grande au survol */
+}
+
+button[type="submit"]:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.4), var(--shadow-medium); /* Halo de focus */
+}
+
+
+/* Indicateur de chargement */
+#loading {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #dadce0;
+    background-color: #f8f9fa;
+    text-align: center;
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-medium);
+    color: #5f6368;
+}
+
+#loading p {
+    margin: 0;
+    font-size: 16px;
+}

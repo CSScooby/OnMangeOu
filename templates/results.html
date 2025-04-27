@@ -2,15 +2,115 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Résultats</title>
+    <title>Résultats de la recherche</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_results.css') }}">
 </head>
 <body>
-    <h1>Restaurants trouvés</h1>
-    <ul>
-        {% for resto in restos %}
-        <li>{{ resto['name'] }} - {{ resto['vicinity'] }}</li>
-        {% endfor %}
-    </ul>
-    <a href="/">Revenir</a>
+    <!-- Barre supérieure (simule une app bar) -->
+    <header class="app-bar">
+        <h1>Résultats - On Mange Où ?</h1>
+        <div class="app-bar-actions">
+            <!-- Bouton pour utiliser la localisation -->
+            <button id="location-button" aria-label="Utiliser ma localisation pour trier par distance" disabled>
+                 <img src="{{ url_for('static', filename='assets/my_location.svg') }}" alt="Ma localisation" class="icon">
+                 <span>Trier par distance</span>
+            </button>
+            <!-- Bouton pour ouvrir/fermer les filtres -->
+            <button id="filter-toggle-button" aria-label="Afficher les filtres" aria-controls="filter-controls" aria-expanded="false">
+                 <img src="{{ url_for('static', filename='assets/filter_list.svg') }}" alt="Filtres" class="icon">
+                 <span>Filtres</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Fond semi-transparent (pour l'overlay des filtres) -->
+    <div id="filter-backdrop" class="backdrop"></div>
+
+    <!-- Section des filtres (maintenant en overlay) -->
+    <div id="filter-controls" class="filter-panel" role="dialog" aria-modal="true" aria-labelledby="filter-panel-title">
+        <div class="filter-panel-header">
+            <h2 id="filter-panel-title">Filtres</h2>
+            <!-- Bouton pour fermer les filtres -->
+            <button id="filter-close-button" aria-label="Fermer les filtres">
+                <img src="{{ url_for('static', filename='assets/close.svg') }}" alt="Fermer" class="icon">
+            </button>
+        </div>
+        <div class="filter-content">
+            <!-- Groupe de tri -->
+            <div class="filter-group">
+                <label for="sort-by">Trier par</label>
+                <select id="sort-by">
+                    <option value="default">Pertinence (défaut)</option>
+                    <option value="distance" disabled>Distance (plus proche)</option>
+                    <option value="rating">Note (meilleure)</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="min-rating">Note minimale</label>
+                <select id="min-rating">
+                    <option value="0">Toutes</option>
+                    <option value="3">3+</option>
+                    <option value="3.5">3.5+</option>
+                    <option value="4">4+</option>
+                    <option value="4.5">4.5+</option>
+                </select>
+            </div>
+            {% if available_types %}
+            <div class="filter-group">
+                <label>Types de cuisine</label>
+                <div id="type-filters">
+                    {% for type_name in available_types %}
+                    <div class="type-checkbox">
+                        <input type="checkbox" id="type-{{ loop.index }}" name="type_filter" value="{{ type_name }}">
+                        <label for="type-{{ loop.index }}">{{ type_name }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            <button id="reset-filters">Réinitialiser</button>
+        </div>
+    </div>
+
+    <!-- Conteneur principal pour la disposition côte à côte -->
+    <div id="results-container">
+        <!-- Colonne de gauche : Liste et Bouton Nouvelle Recherche -->
+        <div id="left-column">
+            {% if restos %}
+                <!-- Conteneur pour la liste des résultats -->
+                <ul id="results-list">
+                    <!-- Le contenu sera généré par filter.js -->
+                </ul>
+                <!-- Intégrer les données des restaurants en JSON -->
+                <script id="restos-data" type="application/json">
+                    {{ restos | tojson | safe }}
+                </script>
+            {% else %}
+                <p class="message">{{ message | default("Aucun restaurant trouvé ou une erreur s'est produite.") }}</p>
+            {% endif %}
+            <!-- Bouton Nouvelle Recherche (maintenant en dehors du if/else et à la fin de la colonne) -->
+            <a href="/" class="back-link">Nouvelle recherche</a>
+        </div>
+
+        <!-- Colonne de droite : Carte -->
+        <div id="right-column">
+            <div id="map"></div>
+        </div>
+    </div> <!-- Fin de results-container -->
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Script de filtrage et interaction -->
+    <script src="{{ url_for('static', filename='filter.js') }}" defer></script>
 </body>
 </html>
