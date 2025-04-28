@@ -175,3 +175,4 @@ cython_debug/
 
 # Debug files
 route_debug.json
+restaurants_debug.json
