@@ -51,6 +51,7 @@
                     <option value="default">Pertinence (défaut)</option>
                     <option value="distance" disabled>Distance (plus proche)</option>
                     <option value="rating">Note (meilleure)</option>
+                    <option value="detour">Temps de détour (plus court)</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -61,6 +62,17 @@
                     <option value="3.5">3.5+</option>
                     <option value="4">4+</option>
                     <option value="4.5">4.5+</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="max-detour">Temps de détour max</label>
+                <select id="max-detour">
+                    <option value="any">Tous</option>
+                    <option value="5">≤ 5 min</option>
+                    <option value="10">≤ 10 min</option>
+                    <option value="15">≤ 15 min</option>
+                    <option value="30">≤ 30 min</option>
+                    <option value="31">> 30 min</option>
                 </select>
             </div>
             {% if available_types %}

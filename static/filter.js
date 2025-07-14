@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Récupérer les éléments du DOM
     const minRatingSelect = document.getElementById('min-rating');
+    const maxDetourSelect = document.getElementById('max-detour');
     const typeCheckboxesContainer = document.getElementById('type-filters');
     const resultsList = document.getElementById('results-list');
     const resetButton = document.getElementById('reset-filters');
@@ -415,11 +416,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const minRating = parseFloat(minRatingSelect.value);
         const selectedTypesCheckboxes = typeCheckboxesContainer.querySelectorAll('input[name="type_filter"]:checked');
         const selectedTypes = Array.from(selectedTypesCheckboxes).map(cb => cb.value);
+        // --- Nouveau : filtre temps de détour ---
+        let maxDetourValue = maxDetourSelect ? maxDetourSelect.value : "any";
+        // console.log("Valeur maxDetour:", maxDetourValue); // Debug
 
         let filteredRestos = allRestos.filter(resto => {
             const ratingMatch = resto.rating == null || resto.rating >= minRating;
             const typeMatch = selectedTypes.length === 0 || (resto.types && selectedTypes.some(selectedType => resto.types.includes(selectedType)));
-            return ratingMatch && typeMatch;
+            // --- Filtre temps de détour ---
+            let detourMatch = true;
+            if (maxDetourValue !== "any" && resto.detour_duration_min != null) {
+                const detour = resto.detour_duration_min;
+                if (maxDetourValue === "31") {
+                    detourMatch = detour > 30;
+                } else {
+                    detourMatch = detour <= parseInt(maxDetourValue, 10);
+                }
+            }
+            return ratingMatch && typeMatch && detourMatch;
         });
 
         // 2. Appliquer le tri
@@ -430,6 +444,13 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (sortBy === 'rating') {
             // Trier par note décroissante (mettre ceux sans note à la fin)
             filteredRestos.sort((a, b) => (b.rating ?? -1) - (a.rating ?? -1));
+        } else if (sortBy === 'detour') {
+            // --- Tri par temps de détour croissant ---
+            filteredRestos.sort((a, b) => {
+                const da = a.detour_duration_min ?? Infinity;
+                const db = b.detour_duration_min ?? Infinity;
+                return da - db;
+            });
         }
         // else 'default': pas de tri spécifique après le filtrage, l'ordre dépend de l'API
 
@@ -443,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const checkboxes = typeCheckboxesContainer.querySelectorAll('input[name="type_filter"]');
         checkboxes.forEach(checkbox => checkbox.checked = false);
         sortBySelect.value = "default"; // Réinitialiser aussi le tri
+        if (maxDetourSelect) maxDetourSelect.value = "any"; // Réinitialiser le filtre de détour
 
         if (userLocationMarker) {
             userLocationMarker.remove();
@@ -462,6 +484,9 @@ document.addEventListener('DOMContentLoaded', () => {
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', applyFiltersAndSort);
     });
+    if (maxDetourSelect) {
+        maxDetourSelect.addEventListener('change', applyFiltersAndSort);
+    }
     resetButton.addEventListener('click', resetFilters);
 
     // Afficher les résultats initiaux (filtrés mais non triés par défaut)
