@@ -314,6 +314,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (resto.user_ratings_total) {
                     ratingHtml += ` <span class="rating-count">(${resto.user_ratings_total} avis)</span>`;
                 }
+                // --- Ajout du temps de détour à côté des avis ---
+                if (resto.detour_duration_min != null) {
+                    ratingHtml += ` <span class="detour">| Détour: ${resto.detour_duration_min} min</span>`;
+                }
                 ratingHtml += '<br>';
             }
             let typesHtml = '';
@@ -463,4 +467,5 @@ document.addEventListener('DOMContentLoaded', () => {
     // Afficher les résultats initiaux (filtrés mais non triés par défaut)
     applyFiltersAndSort();
 });
+// La logique d'affichage du détour reste inchangée, car le champ contient maintenant le temps supplémentaire.
 

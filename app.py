@@ -62,6 +62,36 @@ def get_nearby_places(lat, lng, keywords, radius=5000):
         return []
 
 
+def get_detour_duration(depart, arrivee, waypoint_lat, waypoint_lng, direct_seconds=None):
+    """
+    Calcule le temps de détour (en minutes) pour passer par un lieu donné.
+    Retourne (minutes de détour, secondes détour total).
+    """
+    waypoint = f"{waypoint_lat},{waypoint_lng}"
+    url_detour = (
+        f"https://maps.googleapis.com/maps/api/directions/json?"
+        f"origin={depart}&destination={arrivee}&waypoints=via:{waypoint}&key={GOOGLE_API_KEY}"
+    )
+    try:
+        resp_detour = requests.get(url_detour)
+        resp_detour.raise_for_status()
+        data_detour = resp_detour.json()
+        detour_seconds = 0
+        if data_detour.get('routes'):
+            detour_legs = data_detour['routes'][0].get('legs', [])
+            detour_seconds = sum(leg.get('duration', {}).get('value', 0) for leg in detour_legs)
+
+        if direct_seconds is not None and detour_seconds > 0:
+            extra_minutes = round((detour_seconds - direct_seconds) / 60)
+            total_minutes = round(detour_seconds / 60)
+            return extra_minutes if extra_minutes > 0 else 0, total_minutes
+        else:
+            return None, None
+    except Exception as e:
+        print(f"Erreur lors du calcul du détour: {e}")
+        return None, None
+
+
 @app.route('/', methods=['GET'])
 def index():
     """Affiche la page d'accueil avec le formulaire."""
@@ -89,6 +119,26 @@ def search():
 
     # Définir les mots-clés pour la recherche Places API
     search_keywords = "restaurant OR cafe OR boulangerie OR \"aire autoroute\" OR \"aire de service\" OR \"fast food\" OR \"meal takeaway\""
+
+    # --- Calculer et afficher le temps du trajet direct ---
+    url_direct = (
+        f"https://maps.googleapis.com/maps/api/directions/json?"
+        f"origin={depart}&destination={arrivee}&key={GOOGLE_API_KEY}"
+    )
+    direct_seconds = None
+    try:
+        resp_direct = requests.get(url_direct)
+        resp_direct.raise_for_status()
+        data_direct = resp_direct.json()
+        if data_direct.get('routes'):
+            direct_legs = data_direct['routes'][0].get('legs', [])
+            direct_seconds = sum(leg.get('duration', {}).get('value', 0) for leg in direct_legs)
+            direct_minutes = round(direct_seconds / 60)
+            print(f"Temps du trajet direct : {direct_minutes} min")
+        else:
+            print("Impossible de récupérer le temps du trajet direct.")
+    except Exception as e:
+        print(f"Erreur lors du calcul du trajet direct: {e}")
 
     if route_data and 'routes' in route_data and route_data['routes']:
         # Récupérer la polyline encodée de l'itinéraire global
@@ -140,6 +190,12 @@ def search():
                                     query = urllib.parse.quote_plus(f"{name}, {vicinity}")
                                     maps_url = f"https://www.google.com/maps/search/?api=1&query={query}"
 
+                                    # --- Calculer le temps de détour (juste le supplément et le total) ---
+                                    detour_duration_min, detour_total_min = get_detour_duration(depart, arrivee, resto_lat, resto_lng, direct_seconds)
+                                    # --- Affichage terminal ---
+                                    if detour_duration_min is not None and detour_total_min is not None:
+                                        print(f"{name} : {detour_total_min} min pour départ -> lieu -> arrivée | +{detour_duration_min} min de détour")
+                                    # --- Fin affichage terminal ---
                                     restos.append({
                                         'name': name,
                                         'vicinity': vicinity,
@@ -149,7 +205,9 @@ def search():
                                         'types': cleaned_types,  # Utiliser les types nettoyés
                                         'maps_url': maps_url,  # Ajouter l'URL Google Maps
                                         'lat': resto_lat,  # Ajouter la latitude
-                                        'lng': resto_lng  # Ajouter la longitude
+                                        'lng': resto_lng,  # Ajouter la longitude
+                                        'detour_duration_min': detour_duration_min,
+                                        'detour_total_min': detour_total_min
                                     })
                                     restos_ids.add(place_id)
 
@@ -195,5 +253,7 @@ def get_route(depart, arrivee):
         return None  # Retourner None si la réponse n'est pas du JSON valide
 
 
+if __name__ == '__main__':
+    app.run(debug=True)
 if __name__ == '__main__':
     app.run(debug=True)
